@@ -1,5 +1,6 @@
 import { useState } from "react";
 import TransactionForm from "./Components/TransactionForm";
+import TransactionList from "./Components/TransactionList";
 
 function App() {
   const [transactions, setTransactions] = useState([]);
@@ -8,53 +9,32 @@ function App() {
     setTransactions([...transactions, transaction]);
   };
 
-  // 🔹 Calculate totals dynamically
-  const amounts = transactions.map((t) => t.amount);
-  const balance = amounts.reduce((acc, item) => acc + item, 0).toFixed(2);
-  const income = amounts
-    .filter((item) => item > 0)
-    .reduce((acc, item) => acc + item, 0)
-    .toFixed(2);
-  const expense = (
-    amounts.filter((item) => item < 0).reduce((acc, item) => acc + item, 0) * -1
-  ).toFixed(2);
+  const deleteTransaction = (id) => {
+    setTransactions(transactions.filter((t) => t.id !== id));
+  };
+  // Totals calculation
+const amounts = transactions.map((t) => t.amount);
+const balance = amounts.reduce((acc, item) => acc + item, 0).toFixed(2);
+const income = amounts
+  .filter((item) => item > 0)
+  .reduce((acc, item) => acc + item, 0)
+  .toFixed(2);
+const expense = (
+  amounts.filter((item) => item < 0).reduce((acc, item) => acc + item, 0) * -1
+).toFixed(2);
+
 
   return (
-    <div style={{ fontFamily: "Arial, sans-serif", padding: "20px" }}>
+    <div style={{ padding: "20px", fontFamily: "Arial, sans-serif" }}>
       <h1 style={{ textAlign: "center" }}>💰 Personal Expense Tracker</h1>
-      <p style={{ textAlign: "center" }}>Track your income and expenses easily.</p>
-
-      <div style={{ marginTop: "20px", textAlign: "center" }}>
-        <h2>Balance</h2>
-        <h2 style={{ fontWeight: "bold", color: "blue" }}>NPR {balance}</h2>
-      </div>
-
-      <div style={{ display: "flex", justifyContent: "space-around", marginTop: "20px" }}>
-        <div>
-          <h2>Income</h2>
-          <h2 style={{ color: "green" }}>+ NPR {income}</h2>
-        </div>
-
-        <div>
-          <h2>Expenses</h2>
-          <h2 style={{ color: "red" }}>- NPR {expense}</h2>
-        </div>
-      </div>
+      <div style={{ textAlign: "center", marginBottom: "20px" }}>
+  <h2 style={{ color: "blue" }}>Balance: NPR {balance}</h2>
+  <h3 style={{ color: "green" }}>Income: NPR {income}</h3>
+  <h3 style={{ color: "red" }}>Expenses: NPR {expense}</h3>
+</div>
 
       <TransactionForm onAddTransaction={addTransaction} />
-
-      <h3 style={{ marginTop: "30px" }}>📜 Transactions</h3>
-      <ul>
-        {transactions.map((t) => (
-          <li key={t.id}>
-            {t.text} : {t.amount < 0 ? (
-              <span style={{ color: "red" }}>{t.amount}</span>
-            ) : (
-              <span style={{ color: "green" }}>{t.amount}</span>
-            )}
-          </li>
-        ))}
-      </ul>
+      <TransactionList transactions={transactions} onDelete={deleteTransaction} />
     </div>
   );
 }
