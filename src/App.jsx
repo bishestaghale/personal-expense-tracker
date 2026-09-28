@@ -5,6 +5,7 @@ import ExpenseChart from "./Components/ExpenseChart";
 
 function App() {
   const [transactions, setTransactions] = useState([]);
+  const [filter, setFilter] = useState("all");
 
   const addTransaction = (transaction) => {
     setTransactions([...transactions, transaction]);
@@ -24,6 +25,16 @@ function App() {
   const expense = (
     amounts.filter((item) => item < 0).reduce((acc, item) => acc + item, 0) * -1
   ).toFixed(2);
+
+  // Filter & Sort Logic
+  let displayedTransactions = [...transactions];
+  if (filter === "income") {
+    displayedTransactions = transactions.filter((t) => t.amount > 0);
+  } else if (filter === "expense") {
+    displayedTransactions = transactions.filter((t) => t.amount < 0);
+  } else if (filter === "sortAmount") {
+    displayedTransactions.sort((a, b) => a.amount - b.amount);
+  }
 
   return (
     <div style={{ padding: "20px", fontFamily: "Arial, sans-serif" }}>
@@ -69,38 +80,17 @@ function App() {
           marginBottom: "20px",
         }}
       >
-        <div
-          style={{
-            backgroundColor: "#e6f7ff",
-            padding: "15px",
-            borderRadius: "10px",
-            boxShadow: "0 2px 5px rgba(0,0,0,0.1)",
-          }}
-        >
+        <div style={{ backgroundColor: "#e6f7ff", padding: "15px", borderRadius: "10px" }}>
           <h3 style={{ margin: 0, color: "#0073e6" }}>💳 Balance</h3>
           <p style={{ fontWeight: "bold", fontSize: "1.2rem" }}>NPR {balance}</p>
         </div>
 
-        <div
-          style={{
-            backgroundColor: "#e6ffe6",
-            padding: "15px",
-            borderRadius: "10px",
-            boxShadow: "0 2px 5px rgba(0,0,0,0.1)",
-          }}
-        >
+        <div style={{ backgroundColor: "#e6ffe6", padding: "15px", borderRadius: "10px" }}>
           <h3 style={{ margin: 0, color: "green" }}>📈 Income</h3>
           <p style={{ fontWeight: "bold", fontSize: "1.2rem" }}>NPR {income}</p>
         </div>
 
-        <div
-          style={{
-            backgroundColor: "#ffe6e6",
-            padding: "15px",
-            borderRadius: "10px",
-            boxShadow: "0 2px 5px rgba(0,0,0,0.1)",
-          }}
-        >
+        <div style={{ backgroundColor: "#ffe6e6", padding: "15px", borderRadius: "10px" }}>
           <h3 style={{ margin: 0, color: "red" }}>📉 Expenses</h3>
           <p style={{ fontWeight: "bold", fontSize: "1.2rem" }}>NPR {expense}</p>
         </div>
@@ -109,9 +99,17 @@ function App() {
       {/* Chart Section */}
       <ExpenseChart income={income} expense={expense} />
 
+      {/* Filter Buttons */}
+      <div style={{ textAlign: "center", marginBottom: "20px" }}>
+        <button onClick={() => setFilter("all")} style={{ margin: "5px" }}>All</button>
+        <button onClick={() => setFilter("income")} style={{ margin: "5px" }}>Income</button>
+        <button onClick={() => setFilter("expense")} style={{ margin: "5px" }}>Expenses</button>
+        <button onClick={() => setFilter("sortAmount")} style={{ margin: "5px" }}>Sort by Amount</button>
+      </div>
+
       {/* Form + List */}
       <TransactionForm onAddTransaction={addTransaction} />
-      <TransactionList transactions={transactions} onDelete={deleteTransaction} />
+      <TransactionList transactions={displayedTransactions} onDelete={deleteTransaction} />
     </div>
   );
 }
